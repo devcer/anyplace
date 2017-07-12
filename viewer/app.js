@@ -57,48 +57,55 @@ app.service('GMapService', function () {
         overviewMapControl: true
     };
 
-    self.gmap = new google.maps.Map(document.getElementById('map-canvas'),
-        mapOptions);
+    var mymap = L.map('map-canvas').setView([30, 0], 2);
+L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+    minZoom: 2,
+    id: 'mapbox.streets',
+    accessToken: 'pk.eyJ1Ijoidmlzd2FuYXRoYW1zYW50b3NoIiwiYSI6ImNqNHdkbmlnOTEycTQyd3BsM25jNzYzdXQifQ._PKhrQU1f83K0G7lpRVDtw'
+}).addTo(mymap);
+    // self.gmap = new google.maps.Map(document.getElementById('map-canvas'),
+    //     mapOptions);
 
-    var directionsService = new google.maps.DirectionsService();
-    var directionsDisplay = new google.maps.DirectionsRenderer();
+    // var directionsService = new google.maps.DirectionsService();
+    // var directionsDisplay = new google.maps.DirectionsRenderer();
 
-    self.calcRoute = function (start, end, callback) {
-        if (!start || !end) {
-            console.log("Invalid start or end point.");
-            return;
-        }
+    // self.calcRoute = function (start, end, callback) {
+    //     if (!start || !end) {
+    //         console.log("Invalid start or end point.");
+    //         return;
+    //     }
 
-        var request = {
-            origin: start,
-            destination: end,
-            travelMode: google.maps.TravelMode.DRIVING
-        };
+    //     var request = {
+    //         origin: start,
+    //         destination: end,
+    //         travelMode: google.maps.TravelMode.DRIVING
+    //     };
 
-        directionsService.route(request, function (response, status) {
-            if (status == google.maps.DirectionsStatus.OK) {
-                directionsDisplay.setMap(self.gmap);
-                directionsDisplay.setDirections(response);
-                if (response && response.routes && response.routes.length && response.routes[0].overview_path && response.routes[0].overview_path.length) {
-                    var len = response.routes[0].overview_path.length;
-                    callback(response.routes[0].overview_path[len - 1]);
-                } else {
-                    callback(undefined);
-                }
-            } else {
-                callback(undefined);
-            }
-        });
-    };
+    //     directionsService.route(request, function (response, status) {
+    //         if (status == google.maps.DirectionsStatus.OK) {
+    //             directionsDisplay.setMap(self.gmap);
+    //             directionsDisplay.setDirections(response);
+    //             if (response && response.routes && response.routes.length && response.routes[0].overview_path && response.routes[0].overview_path.length) {
+    //                 var len = response.routes[0].overview_path.length;
+    //                 callback(response.routes[0].overview_path[len - 1]);
+    //             } else {
+    //                 callback(undefined);
+    //             }
+    //         } else {
+    //             callback(undefined);
+    //         }
+    //     });
+    // };
 
-    self.clearRoute = function () {
-        if (directionsDisplay)
-            directionsDisplay.setMap(null);
-    };
+    // self.clearRoute = function () {
+    //     if (directionsDisplay)
+    //         directionsDisplay.setMap(null);
+    // };
 
-    self.isRouteShown = function () {
-        return directionsDisplay && directionsDisplay.getMap();
-    };
+    // self.isRouteShown = function () {
+    //     return directionsDisplay && directionsDisplay.getMap();
+    // };
 
     // Initialize search box for places
 //    var input = (document.getElementById('pac-input'));
