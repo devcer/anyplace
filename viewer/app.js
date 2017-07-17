@@ -57,18 +57,19 @@ app.service('GMapService', function () {
         overviewMapControl: true
     };
 
-    var mymap = L.map('map-canvas').setView([30, 0], 2);
-L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-    minZoom: 2,
-    id: 'mapbox.streets',
-    accessToken: 'pk.eyJ1Ijoidmlzd2FuYXRoYW1zYW50b3NoIiwiYSI6ImNqNHdkbmlnOTEycTQyd3BsM25jNzYzdXQifQ._PKhrQU1f83K0G7lpRVDtw'
-}).addTo(mymap);
+    self.gmap = L.map('map-canvas').setView([30, 0], 2);
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+        attribution: '',
+        minZoom: 2,
+        id: 'mapbox.streets',
+        accessToken: 'pk.eyJ1Ijoidmlzd2FuYXRoYW1zYW50b3NoIiwiYSI6ImNqNHdkbmlnOTEycTQyd3BsM25jNzYzdXQifQ._PKhrQU1f83K0G7lpRVDtw'
+    }).addTo(self.gmap);
+    console.log("Hello World");
     // self.gmap = new google.maps.Map(document.getElementById('map-canvas'),
     //     mapOptions);
 
-    // var directionsService = new google.maps.DirectionsService();
-    // var directionsDisplay = new google.maps.DirectionsRenderer();
+    var directionsService = new google.maps.DirectionsService();
+    var directionsDisplay = new google.maps.DirectionsRenderer();
 
     // self.calcRoute = function (start, end, callback) {
     //     if (!start || !end) {
@@ -103,9 +104,9 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={
     //         directionsDisplay.setMap(null);
     // };
 
-    // self.isRouteShown = function () {
-    //     return directionsDisplay && directionsDisplay.getMap();
-    // };
+    self.isRouteShown = function () {
+        return directionsDisplay && directionsDisplay.getMap();
+    };
 
     // Initialize search box for places
 //    var input = (document.getElementById('pac-input'));

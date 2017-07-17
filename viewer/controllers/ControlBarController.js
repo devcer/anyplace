@@ -96,8 +96,8 @@ app.controller('ControlBarController', ['$scope', '$rootScope', '$routeParams', 
     };
 
     $scope.displayMyLocMarker = function (posLatlng) {
-        if (myLocMarker && myLocMarker.getMap()) {
-            myLocMarker.setPosition(posLatlng);
+        if (myLocMarker && myLocMarker.getElement()) {
+            myLocMarker.setLatLng([posLatlng.lat, posLatlng.lng]);
             return;
         }
 
@@ -105,18 +105,20 @@ app.controller('ControlBarController', ['$scope', '$rootScope', '$routeParams', 
         if ($scope.isFirefox)
             s = new google.maps.Size(48, 48);
 
-        myLocMarker = new google.maps.Marker({
-            position: posLatlng,
-            map: GMapService.gmap,
-            draggable: false,
-            icon: {
-                url: 'build/images/location-radius-centre.png',
-                origin: new google.maps.Point(0, 0), /* origin is 0,0 */
-                anchor: new google.maps.Point(10, 10), /* anchor is bottom center of the scaled image */
-                size: s,
-                scaledSize: new google.maps.Size(20, 20)
-            }
-        });
+        myLocMarker = L.marker([posLatlng.lat, posLatlng.lng]).addTo(GMapService.gmap).bindPopup("you are here");
+        
+        // myLocMarker = new google.maps.Marker({
+        //     position: posLatlng,
+        //     map: GMapService.gmap,
+        //     draggable: false,
+        //     icon: {
+        //         url: 'build/images/location-radius-centre.png',
+        //         origin: new google.maps.Point(0, 0), /* origin is 0,0 */
+        //         anchor: new google.maps.Point(10, 10), /* anchor is bottom center of the scaled image */
+        //         size: s,
+        //         scaledSize: new google.maps.Size(20, 20)
+        //     }
+        // });
     };
 
     $scope.showUserLocation = function () {
@@ -160,7 +162,7 @@ app.controller('ControlBarController', ['$scope', '$rootScope', '$routeParams', 
                     }
 
                     if (!pannedToUserPosOnce) {
-                        GMapService.gmap.panTo(posLatlng);
+                        GMapService.gmap.panTo([posLatlng.lat, posLatlng.lng]);
                         GMapService.gmap.setZoom(19);
                         pannedToUserPosOnce = true;
                     }
@@ -226,22 +228,21 @@ app.controller('ControlBarController', ['$scope', '$rootScope', '$routeParams', 
             d.css({display: 'block'});
 
     $scope.centerViewToSelectedItem = function () {
-        var position = {};
-        if ($scope.anyService.selectedPoi) {
-            var p = $scope.anyService.selectedPoi;
-            position = {lat: parseFloat(p.coordinates_lat), lng: parseFloat(p.coordinates_lon)};
-        } else if ($scope.anyService.selectedBuilding) {
-            var b = $scope.anyService.selectedBuilding;
-            position = {lat: parseFloat(b.coordinates_lat), lng: parseFloat(b.coordinates_lon)};
-        } else {
-            _err("No building is selected.");
-            return;
-        }
+      var position = {};
+      if ($scope.anyService.selectedPoi) {
+        var p = $scope.anyService.selectedPoi;
+        position = {lat: parseFloat(p.coordinates_lat), lng: parseFloat(p.coordinates_lon)};
+      } else if ($scope.anyService.selectedBuilding) {
+        var b = $scope.anyService.selectedBuilding;
+        position = {lat: parseFloat(b.coordinates_lat), lng: parseFloat(b.coordinates_lon)};
+      } else {
+        _err("No building is selected.");
+        return;
+      }
 
-        $scope.gmapService.gmap.panTo(position);
-        $scope.gmapService.gmap.setZoom(20);
+      $scope.gmapService.gmap.panTo([position.lat, position.lng]);
+      $scope.gmapService.gmap.setZoom(20);
     }
-
 }
 ])
 ;

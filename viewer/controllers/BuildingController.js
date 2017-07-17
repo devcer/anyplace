@@ -114,15 +114,24 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
                 if ($scope.isFirefox)
                     s = new google.maps.Size(110, 160);
 
-                var marker = new google.maps.Marker({
-                    position: _latLngFromBuilding(b),
-                    icon: {
-                        url: 'build/images/building-icon.png',
-                        size: s,
-                        scaledSize: new google.maps.Size(55, 80)
-                    },
-                    draggable: false
-                });
+
+                var myIcon = L.icon({
+							    iconUrl: 'build/images/building-icon.png',
+							    iconSize: [55, 80],
+							    iconAnchor: [22, 94],
+								});
+
+								var marker = L.marker([50.5, 30.5],{icon: myIcon});//.addTo(map);	                
+
+                // var marker = new google.maps.Marker({
+                //     position: _latLngFromBuilding(b),
+                //     icon: {
+                //         url: 'build/images/building-icon.png',
+                //         size: s,
+                //         scaledSize: new google.maps.Size(55, 80)
+                //     },
+                //     draggable: false
+                // });
 
                 markerCluster.addMarker(marker);
 
@@ -217,15 +226,22 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
                     if ($scope.isFirefox)
                         s = new google.maps.Size(110, 160);
 
-                    var marker = new google.maps.Marker({
-                        position: _latLngFromBuilding(b),
-                        icon: {
-                            url: 'build/images/building-icon.png',
-                            size: s,
-                            scaledSize: new google.maps.Size(55, 80)
-                        },
-                        draggable: false
-                    });
+                    var myIcon = L.icon({
+									    iconUrl: 'build/images/building-icon.png',
+									    iconSize: [55, 80],
+									    iconAnchor: [22, 94],
+										});
+
+										var marker = L.marker([50.5, 30.5],{icon: myIcon});
+                    // var marker = new google.maps.Marker({
+                    //     position: _latLngFromBuilding(b),
+                    //     icon: {
+                    //         url: 'build/images/building-icon.png',
+                    //         size: s,
+                    //         scaledSize: new google.maps.Size(55, 80)
+                    //     },
+                    //     draggable: false
+                    // });
 
                     markerCluster.addMarker(marker);
 
@@ -307,7 +323,7 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
         if ($scope.anyService.selectedBuilding)
             return v.name;
         var c = $scope.gmapService.gmap.getCenter();
-        return _calcDistance(parseFloat(v.coordinates_lat), parseFloat(v.coordinates_lon), c.lat(), c.lng());
+        return _calcDistance(parseFloat(v.coordinates_lat), parseFloat(v.coordinates_lon), c.lat, c.lng);
     }
 
 }]);
