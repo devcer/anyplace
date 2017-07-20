@@ -1,30 +1,3 @@
-/**
- *
- The MIT License (MIT)
-
- Copyright (c) 2015, Kyriakos Georgiou, Data Management Systems Laboratory (DMSL)
- Department of Computer Science, University of Cyprus, Nicosia, CYPRUS,
- dmsl@cs.ucy.ac.cy, http://dmsl.cs.ucy.ac.cy/
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in
- all copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- */
-
 var app = angular.module('anyArchitect', ['ui.bootstrap', 'ui.select', 'ngSanitize']);
 
 app.service('GMapService', function () {
@@ -47,9 +20,18 @@ app.service('GMapService', function () {
         streetViewControl: false,
         overviewMapControl: true
     };
-    self.gmap = new google.maps.Map(document.getElementById('map-canvas'),
-        mapOptions);
+    // self.gmap = new google.maps.Map(document.getElementById('map-canvas'),
+    //     mapOptions);
 
+    self.gmap = L.map('map-canvas').setView([35.14448545801575, 33.41121554374695], 8);
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+        attribution: '',
+        minZoom: 2,
+        id: 'mapbox.streets',
+        accessToken: 'pk.eyJ1Ijoidmlzd2FuYXRoYW1zYW50b3NoIiwiYSI6ImNqNHdkbmlnOTEycTQyd3BsM25jNzYzdXQifQ._PKhrQU1f83K0G7lpRVDtw'
+    }).addTo(self.gmap);
+    console.log("Hello World");
+    
     // Initialize search box for places
     var input = (document.getElementById('pac-input'));
     self.gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(input);

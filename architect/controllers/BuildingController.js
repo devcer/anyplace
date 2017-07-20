@@ -1,30 +1,3 @@
-/**
- *
- The MIT License (MIT)
-
- Copyright (c) 2015, Kyriakos Georgiou, Data Management Systems Laboratory (DMSL)
- Department of Computer Science, University of Cyprus, Nicosia, CYPRUS,
- dmsl@cs.ucy.ac.cy, http://dmsl.cs.ucy.ac.cy/
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in
- all copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- */
-
 app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'AnyplaceService', 'AnyplaceAPIService', function ($scope, $compile, GMapService, AnyplaceService, AnyplaceAPIService) {
 
     $scope.myMarkers = {};
@@ -90,7 +63,7 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
 
             if (typeof(Storage) !== "undefined" && localStorage) {
                 localStorage.setItem("lastBuilding", newVal.buid);
-            }
+            }       
         }
     });
 
@@ -113,10 +86,8 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
 
     var _latLngFromBuilding = function (b) {
         if (b && b.coordinates_lat && b.coordinates_lon) {
-            return {
-                lat: parseFloat(b.coordinates_lat),
-                lng: parseFloat(b.coordinates_lon)
-            }
+            return [ parseFloat(b.coordinates_lat),
+                parseFloat(b.coordinates_lon) ]
         }
         return undefined;
     };
@@ -164,18 +135,26 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
                     } else {
                         b.is_published = false;
                     }
-
-                    var marker = new google.maps.Marker({
-                        position: _latLngFromBuilding(b),
-                        map: GMapService.gmap,
-                        icon: new google.maps.MarkerImage(
-                            'build/images/building-icon.png',
-                            null, /* size is determined at runtime */
-                            null, /* origin is 0,0 */
-                            null, /* anchor is bottom center of the scaled image */
-                            new google.maps.Size(54, 54)),
-                        draggable: false
+                    var myIcon = L.icon({
+                        iconUrl: 'build/images/building-icon.png',
+                        iconSize: [55, 80],
+                        iconAnchor: [22, 94],
                     });
+
+                    var marker = L.marker(_latLngFromBuilding(b),{icon: myIcon});
+
+
+                    // var marker = new google.maps.Marker({
+                    //     position: _latLngFromBuilding(b),
+                    //     map: GMapService.gmap,
+                    //     icon: new google.maps.MarkerImage(
+                    //         'build/images/building-icon.png',
+                    //         null, /* size is determined at runtime */
+                    //         null, /* origin is 0,0 */
+                    //         null, /* anchor is bottom center of the scaled image */
+                    //         new google.maps.Size(54, 54)),
+                    //     draggable: false
+                    // });
 
                     var htmlContent = '<div class="infowindow-scroll-fix">'
                         + '<h5 style="margin: 0">Building:</h5>'
@@ -445,8 +424,8 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
     $("#draggable-building").draggable({
         helper: 'clone',
         stop: function (e) {
-            var point = new google.maps.Point(e.pageX, e.pageY);
-            var ll = overlay.getProjection().fromContainerPixelToLatLng(point);
+            var point = L.point(e.pageX, e.pageY);
+            var ll = $scope.gmapService.gmap.containerPointToLatLng(point);
             $scope.placeMarker(ll);
         }
     });
@@ -461,12 +440,20 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
             return;
         }
 
-        var marker = new google.maps.Marker({
-            position: location,
-            map: GMapService.gmap,
-            icon: 'build/images/building-icon.png',
-            draggable: true
+        // var marker = new google.maps.Marker({
+        //     position: location,
+        //     map: GMapService.gmap,
+        //     icon: 'build/images/building-icon.png',
+        //     draggable: true
+        // });
+
+        var myIcon = L.icon({
+            iconUrl: 'build/images/building-icon.png',
+            iconSize: [55, 80],
+            iconAnchor: [22, 94],
         });
+
+        var marker = L.marker([location.lat,location.lng],{icon: myIcon}).addto($scope.gmapService.gmap);
 
         var infowindow = new google.maps.InfoWindow({
             content: '-',
