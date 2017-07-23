@@ -453,7 +453,7 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
             iconAnchor: [22, 94],
         });
 
-        var marker = L.marker([location.lat,location.lng],{icon: myIcon}).addto($scope.gmapService.gmap);
+        var marker = L.marker([location.lat,location.lng],{icon: myIcon}).addTo($scope.gmapService.gmap);
 
         var infowindow = new google.maps.InfoWindow({
             content: '-',

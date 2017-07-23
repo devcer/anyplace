@@ -34,26 +34,26 @@ app.service('GMapService', function () {
     
     // Initialize search box for places
     var input = (document.getElementById('pac-input'));
-    self.gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-    self.searchBox = new google.maps.places.SearchBox((input));
+    // self.gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+    // self.searchBox = new google.maps.places.SearchBox((input));
 
-    google.maps.event.addListener(self.searchBox, 'places_changed', function () {
-        var places = self.searchBox.getPlaces();
+    // google.maps.event.addListener(self.searchBox, 'places_changed', function () {
+    //     var places = self.searchBox.getPlaces();
 
-        if (places.length == 0) {
-            return;
-        }
+    //     if (places.length == 0) {
+    //         return;
+    //     }
 
-        self.gmap.panTo(places[0].geometry.location);
-        self.gmap.setZoom(17);
-    });
+    //     self.gmap.panTo(places[0].geometry.location);
+    //     self.gmap.setZoom(17);
+    // });
 
-    // Bias the SearchBox results towards places that are within the bounds of the
-    // current map's viewport.
-    self.gmap.addListener(self.gmap, 'bounds_changed', function () {
-        var bounds = self.gmap.getBounds();
-        self.searchBox.setBounds(bounds);
-    });
+    // // Bias the SearchBox results towards places that are within the bounds of the
+    // // current map's viewport.
+    // self.gmap.addListener(self.gmap, 'bounds_changed', function () {
+    //     var bounds = self.gmap.getBounds();
+    //     self.searchBox.setBounds(bounds);
+    // });
 
 });
 
