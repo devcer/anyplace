@@ -12,6 +12,7 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
     $scope.myBuildingsHashT = {};
 
     $scope.crudTabSelected = 1;
+    $scope.markerGroup = L.layerGroup().addTo($scope.gmapService.gmap);
     $scope.setCrudTabSelected = function (n) {
         $scope.crudTabSelected = n;
 
@@ -111,10 +112,10 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
                 //var bs = JSON.parse( data.buildings );
                 $scope.myBuildings = data.buildings;
 
-                var infowindow = new google.maps.InfoWindow({
-                    content: '-',
-                    maxWidth: 500
-                });
+                // var infowindow = new google.maps.InfoWindow({
+                //     content: '-',
+                //     maxWidth: 500
+                // });
 
                 var localStoredBuildingIndex = -1;
                 var localStoredBuildingId = undefined;
@@ -137,8 +138,7 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
                     }
                     var myIcon = L.icon({
                         iconUrl: 'build/images/building-icon.png',
-                        iconSize: [55, 80],
-                        iconAnchor: [22, 94],
+                        iconSize: [55, 55]
                     });
 
                     var marker = L.marker(_latLngFromBuilding(b),{icon: myIcon});
@@ -212,8 +212,8 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
                 return;
             }
 
-            building.coordinates_lat = String($scope.myMarkers[id].marker.position.lat());
-            building.coordinates_lon = String($scope.myMarkers[id].marker.position.lng());
+            building.coordinates_lat = String($scope.myMarkers[id].marker._latlng.lat);
+            building.coordinates_lon = String($scope.myMarkers[id].marker._latlng.lng);
 
             if (building.coordinates_lat === undefined || building.coordinates_lat === null) {
                 _err("Invalid building latitude.");
@@ -257,17 +257,17 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
 
                         $scope.anyService.selectedBuilding = $scope.myBuildings[$scope.myBuildings.length - 1];
 
-                        $scope.myMarkers[id].marker.setDraggable(false);
+                        $scope.myMarkers[id].marker.dragging.disable();
 
                         $scope.myBuildingsHashT[building.buid] = {
                             marker: $scope.myMarkers[id].marker,
                             model: building
                         };
 
-                        if ($scope.myMarkers[id].infowindow) {
-                            $scope.myMarkers[id].infowindow.setContent($scope.myMarkers[id].marker.tpl2[0]);
-                            $scope.myMarkers[id].infowindow.close();
-                        }
+                        // if ($scope.myMarkers[id].infowindow) {
+                        //     $scope.myMarkers[id].infowindow.setContent($scope.myMarkers[id].marker.tpl2[0]);
+                        //     $scope.myMarkers[id].infowindow.close();
+                        // }
 
                         _suc("Building added successfully.");
 
@@ -416,29 +416,36 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
 
     };
 
-    var overlay = new google.maps.OverlayView();
-    overlay.draw = function () {
-    };
-    overlay.setMap(GMapService.gmap);
-
-    $("#draggable-building").draggable({
+    // var overlay = new google.maps.OverlayView();
+    // overlay.draw = function () {
+    // };
+    // overlay.setMap(GMapService.gmap);
+    $(".draggable-building").draggable({
         helper: 'clone',
         stop: function (e) {
+            //setting the icon to initial position
+            // $( '#draggable-building' ).css( 'top', topPos );
+            // $( '#draggable-building' ).css( 'left', leftPos );
+
+            // $(".draggable-building").css({top: 0, left: 0});
+// $(".draggable-building").removeClass('ui-draggable ui-draggable-handle ui-draggable-dragging');            
+// $scope.makeBuildingDraggableAgain();
             var point = L.point(e.pageX, e.pageY);
             var ll = $scope.gmapService.gmap.containerPointToLatLng(point);
             $scope.placeMarker(ll);
         }
     });
+    
 
     $scope.placeMarker = function (location) {
 
-        var prevMarker = $scope.myMarkers[$scope.myMarkerId - 1];
+        // var prevMarker = $scope.myMarkers[$scope.myMarkerId - 1];
 
-        if (prevMarker && prevMarker.marker && prevMarker.marker.getMap() && prevMarker.marker.getDraggable()) {
-            // TODO: alert for already pending building.
-            console.log('there is a building pending, please add 1 at a time');
-            return;
-        }
+        // if (prevMarker && prevMarker.marker && prevMarker.marker.getMap() && prevMarker.marker.getDraggable()) {
+        //     // TODO: alert for already pending building.
+        //     console.log('there is a building pending, please add 1 at a time');
+        //     return;
+        // }
 
         // var marker = new google.maps.Marker({
         //     position: location,
@@ -446,20 +453,11 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
         //     icon: 'build/images/building-icon.png',
         //     draggable: true
         // });
-
         var myIcon = L.icon({
             iconUrl: 'build/images/building-icon.png',
-            iconSize: [55, 80],
-            iconAnchor: [22, 94],
+            iconSize: [55, 55]
         });
-
-        var marker = L.marker([location.lat,location.lng],{icon: myIcon}).addTo($scope.gmapService.gmap);
-
-        var infowindow = new google.maps.InfoWindow({
-            content: '-',
-            maxWidth: 500
-        });
-
+        var marker = L.marker([location.lat,location.lng],{draggable: true,icon: myIcon});
         $scope.$apply(function () {
             marker.myId = $scope.myMarkerId;
             $scope.myMarkers[marker.myId] = {};
@@ -472,7 +470,7 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
                 bucode: ""
             };
             $scope.myMarkers[marker.myId].marker = marker;
-            $scope.myMarkers[marker.myId].infowindow = infowindow;
+            // $scope.myMarkers[marker.myId].infowindow = infowindow;
             $scope.myMarkerId++;
         });
 
@@ -496,7 +494,7 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
             + '</button>'
             + '</fieldset>'
             + '<fieldset class="form-group" style="display: inline-block;width: 23%;">'
-            + '<button class="btn btn-danger add-any-button" style="margin-left:2px" ng-click="deleteTempBuilding(' + marker.myId + ')"><span class="glyphicon glyphicon-remove"></span>'
+            + '<button type="button" class="btn btn-danger add-any-button" style="margin-left:2px" ng-click="deleteTempBuilding(' + marker.myId + ')"><span class="glyphicon glyphicon-remove"></span>'
             + '</button>'
             + '</fieldset>'
             + '</div>'
@@ -509,23 +507,35 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
             + '<span>{{myMarkers[' + marker.myId + '].model.description}}</span>'
             + '</div>';
 
-        var tpl = $compile(htmlContent)($scope);
-        marker.tpl2 = $compile(htmlContent2)($scope);
 
-        infowindow.setContent(tpl[0]);
-        infowindow.open(GMapService.gmap, marker);
+        
+        var tpl = $compile(htmlContent)($scope);        
+        marker.addTo($scope.markerGroup).bindPopup(tpl[0]).openPopup();
+        console.log("for debugging");
+        // var infowindow = new google.maps.InfoWindow({
+        //     content: '-',
+        //     maxWidth: 500
+        // });
 
-        google.maps.event.addListener(marker, 'click', function () {
-            if (!infowindow.getMap()) {
-                infowindow.open(GMapService.gmap, marker);
-            }
-        });
+
+        // var tpl = $compile(htmlContent)($scope);
+        // marker.tpl2 = $compile(htmlContent2)($scope);
+
+        // infowindow.setContent(tpl[0]);
+        // infowindow.open(GMapService.gmap, marker);
+
+        // google.maps.event.addListener(marker, 'click', function () {
+        //     if (!infowindow.getMap()) {
+        //         infowindow.open(GMapService.gmap, marker);
+        //     }
+        // });
     };
 
     $scope.deleteTempBuilding = function (id) {
         var myMarker = $scope.myMarkers[id];
         if (myMarker && myMarker.marker) {
-            myMarker.marker.setMap(null);
+            // myMarker.marker.setMap(null);
+            $scope.markerGroup.removeLayer(myMarker.marker._leaflet_id);
         }
     };
 

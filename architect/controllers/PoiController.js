@@ -717,9 +717,9 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
     };
 
     var overlay = new google.maps.OverlayView();
-    overlay.draw = function () {
-    };
-    overlay.setMap(GMapService.gmap);
+    // overlay.draw = function () {
+    // };
+    // overlay.setMap(GMapService.gmap);
 
     $scope.addPoi = function (id) {
         if ($scope.myMarkers[id] && $scope.myMarkers[id].marker) {
