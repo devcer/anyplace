@@ -37,7 +37,7 @@ function CanvasOverlay(image, map) {
 
 
     // Explicitly call setMap on this overlay
-    this.setMap(map);
+    // this.setMap(map);
 }
 
 CanvasOverlay.prototype.onAdd = function () {

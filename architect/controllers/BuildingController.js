@@ -141,7 +141,7 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
                         iconSize: [55, 55]
                     });
 
-                    var marker = L.marker(_latLngFromBuilding(b),{icon: myIcon});
+                    var marker = L.marker([b.coordinates_lat,b.coordinates_lon],{icon: myIcon});
 
 
                     // var marker = new google.maps.Marker({
@@ -162,23 +162,24 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
                         + '<h5 style="margin: 8px 0 0 0">Description:</h5>'
                         + '<span>' + b.description + '</span>'
                         + '</div>';
-
-                    marker.infoContent = htmlContent;
-                    marker.building = b;
+                    var tpl = $compile(htmlContent)($scope);        
+                    marker.addTo($scope.markerGroup).bindPopup(tpl[0]);
+                    // marker.infoContent = htmlContent;
+                    // marker.building = b;
 
                     $scope.myBuildingsHashT[b.buid] = {
                         marker: marker,
                         model: b
                     };
 
-                    google.maps.event.addListener(marker, 'click', function () {
-                        infowindow.setContent(this.infoContent);
-                        infowindow.open(GMapService.gmap, this);
-                        var self = this;
-                        $scope.$apply(function () {
-                            $scope.anyService.selectedBuilding = self.building;
-                        });
-                    });
+                    // google.maps.event.addListener(marker, 'click', function () {
+                    //     infowindow.setContent(this.infoContent);
+                    //     infowindow.open(GMapService.gmap, this);
+                    //     var self = this;
+                    //     $scope.$apply(function () {
+                    //         $scope.anyService.selectedBuilding = self.building;
+                    //     });
+                    // });
                 }
 
                 // using the latest building form localStorage

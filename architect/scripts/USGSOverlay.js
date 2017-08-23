@@ -15,7 +15,7 @@ function USGSOverlay(bounds, image, map) {
     this.div_ = null;
 
     // Explicitly call setMap on this overlay
-    this.setMap(map);
+    // this.setMap(map);
 }
 
 USGSOverlay.prototype.onAdd = function() {
