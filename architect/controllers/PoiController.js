@@ -57,8 +57,9 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
     $scope.$watch('anyService.selectedPoi', function (newVal, oldVal) {
         if (newVal && _latLngFromPoi(newVal)) {
             if (newVal) {
-                GMapService.gmap.panTo(_latLngFromPoi(newVal));
+                // GMapService.gmap.panTo(_latLngFromPoi(newVal));
                 //GMapService.gmap.setZoom(19);
+                GMapService.gmap.setView(_latLngFromPoi(newVal), 19);
                 if (newVal.puid) {
                     var marker = $scope.myPoisHashT[newVal.puid].marker;
                     if (marker && marker.infowindow && marker.tpl2) {
@@ -224,7 +225,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
 
     var _latLngFromPoi = function (p) {
         if (p && p.coordinates_lat && p.coordinates_lon) {
-            return {lat: parseFloat(p.coordinates_lat), lng: parseFloat(p.coordinates_lon)}
+            return [parseFloat(p.coordinates_lat), parseFloat(p.coordinates_lon)]
         }
         return undefined;
     };

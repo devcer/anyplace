@@ -34,9 +34,9 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
 
     // edit building
     if (n === 2) {
-      m.setDraggable(true);
+      m.dragging.enable();
     } else {
-      m.setDraggable(false);
+      m.dragging.disable();;
     }
 
   };
@@ -60,8 +60,10 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
   $scope.$watch('anyService.selectedBuilding', function (newVal, oldVal) {
     if (newVal && newVal.coordinates_lat && newVal.coordinates_lon) {
       // Pan map to selected building
-      $scope.gmapService.gmap.panTo(_latLngFromBuilding(newVal));
-      $scope.gmapService.gmap.setZoom(19);
+      // $scope.gmapService.gmap.panTo(_latLngFromBuilding(newVal));
+      // $scope.gmapService.gmap.setZoom(19);
+
+      $scope.gmapService.gmap.setView(_latLngFromBuilding(newVal), 19);
 
       if (typeof(Storage) !== "undefined" && localStorage) {
         localStorage.setItem("lastBuilding", newVal.buid);
@@ -72,7 +74,7 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
   var _clearBuildingMarkersAndModels = function () {
     for (var b in $scope.myBuildingsHashT) {
       if ($scope.myBuildingsHashT.hasOwnProperty(b)) {
-        $scope.myBuildingsHashT[b].marker.setMap(null);
+        $scope.markerGroup.removeLayer($scope.myBuildingsHashT[b].marker._leaflet_id);
         delete $scope.myBuildingsHashT[b];
       }
     }
@@ -139,7 +141,7 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
           }
           var myIcon = L.icon({
             iconUrl: 'build/images/building-icon.png',
-            iconSize: [55, 55]
+            iconSize: [54, 54]
           });
 
           var marker = L.marker([b.coordinates_lat,b.coordinates_lon],{icon: myIcon});
@@ -317,7 +319,8 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
         console.log("building deleted: ", b);
 
         // delete the building from the loadedBuildings
-        $scope.myBuildingsHashT[b.buid].marker.setMap(null);
+        // $scope.myBuildingsHashT[b.buid].marker.setMap(null);
+        $scope.markerGroup.removeLayer($scope.myBuildingsHashT[b.buid].marker._leaflet_id);
         delete $scope.myBuildingsHashT[b.buid];
 
         var bs = $scope.myBuildings;
@@ -388,10 +391,10 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
 
     var marker = $scope.myBuildingsHashT[b.buid].marker;
     if (marker) {
-      var latLng = marker.position;
-      if (latLng && latLng.lat() && latLng.lng()) {
-        reqObj.coordinates_lat = String(latLng.lat());
-        reqObj.coordinates_lon = String(latLng.lng());
+      var latLng = marker._latlng;
+      if (latLng && latLng.lat && latLng.lng) {
+        reqObj.coordinates_lat = String(latLng.lat);
+        reqObj.coordinates_lon = String(latLng.lng);
       }
     }
 
