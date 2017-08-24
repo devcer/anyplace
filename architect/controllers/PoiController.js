@@ -1417,6 +1417,5 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
         }
     });
 }
-])
-;
+]);
 /* End: PoiController.js */
