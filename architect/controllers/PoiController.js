@@ -1,30 +1,4 @@
-/**
- *
- The MIT License (MIT)
-
- Copyright (c) 2015, Kyriakos Georgiou, Data Management Systems Laboratory (DMSL)
- Department of Computer Science, University of Cyprus, Nicosia, CYPRUS,
- dmsl@cs.ucy.ac.cy, http://dmsl.cs.ucy.ac.cy/
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in
- all copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- */
-
+/* Start: PoiController.js */
 app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceService', 'AnyplaceAPIService', function ($scope, $compile, GMapService, AnyplaceService, AnyplaceAPIService) {
 
     $scope.anyService = AnyplaceService;
@@ -48,7 +22,8 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
         prev: undefined,
         next: undefined
     };
-    $scope.markerGroup = L.layerGroup().addTo(GMapService.gmap);
+    $scope.gmapService = GMapService;
+    $scope.markerGroup = L.layerGroup().addTo($scope.gmapService.gmap);
 
     $scope.orderByName = function (value) {
         return value.name;
@@ -550,43 +525,59 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
     };
 
     var _getConnectorIconBigger = function () {
-        return new google.maps.MarkerImage(
-            _POI_CONNECTOR_IMG,
-            null, /* size is determined at runtime */
-            null, /* origin is 0,0 */
-            null, /* anchor is bottom center of the scaled image */
-            new google.maps.Size(41, 41)
-        )
+        // return new google.maps.MarkerImage(
+        //     _POI_CONNECTOR_IMG,
+        //     null, /* size is determined at runtime */
+        //     null, /* origin is 0,0 */
+        //     null, /* anchor is bottom center of the scaled image */
+        //     new google.maps.Size(41, 41)
+        // )
+        return L.icon({
+            iconUrl: _POI_CONNECTOR_IMG,
+            iconSize: [41, 41]
+        });
     };
 
     var _getConnectorIconNormal = function () {
-        return new google.maps.MarkerImage(
-            _POI_CONNECTOR_IMG,
-            null, /* size is determined at runtime */
-            null, /* origin is 0,0 */
-            null, /* anchor is bottom center of the scaled image */
-            new google.maps.Size(21, 21)
-        )
+        // return new google.maps.MarkerImage(
+        //     _POI_CONNECTOR_IMG,
+        //     null, /* size is determined at runtime */
+        //     null, /* origin is 0,0 */
+        //     null, /* anchor is bottom center of the scaled image */
+        //     new google.maps.Size(21, 21)
+        // )
+      return L.icon({
+        iconUrl: _POI_CONNECTOR_IMG,
+        iconSize: [21, 21]
+      });
     };
 
     var _getNormalPoiIconBigger = function () {
-        return new google.maps.MarkerImage(
-            _POI_EXISTING_IMG,
-            null, /* size is determined at runtime */
-            null, /* origin is 0,0 */
-            null, /* anchor is bottom center of the scaled image */
-            new google.maps.Size(31, 48)
-        )
+        // return new google.maps.MarkerImage(
+        //     _POI_EXISTING_IMG,
+        //     null, /* size is determined at runtime */
+        //     null, /* origin is 0,0 */
+        //     null, /* anchor is bottom center of the scaled image */
+        //     new google.maps.Size(31, 48)
+        // )
+      return L.icon({
+        iconUrl: _POI_EXISTING_IMG,
+        iconSize: [31, 48]
+      });
     };
 
     var _getNormalPoiIconNormal = function () {
-        return new google.maps.MarkerImage(
-            _POI_EXISTING_IMG,
-            null, /* size is determined at runtime */
-            null, /* origin is 0,0 */
-            null, /* anchor is bottom center of the scaled image */
-            new google.maps.Size(21, 32)
-        )
+        // return new google.maps.MarkerImage(
+        //     _POI_EXISTING_IMG,
+        //     null, /* size is determined at runtime */
+        //     null, /* origin is 0,0 */
+        //     null, /* anchor is bottom center of the scaled image */
+        //     new google.maps.Size(21, 32)
+        // )
+      return L.icon({
+        iconUrl: _POI_EXISTING_IMG,
+        iconSize: [21, 32]
+      });
     };
 
     var _checkConnectionFormat = function (bobj) {
@@ -727,7 +718,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
         );
     };
 
-    var overlay = new google.maps.OverlayView();
+    // var overlay = new google.maps.OverlayView();
     // overlay.draw = function () {
     // };
     // overlay.setMap(GMapService.gmap);
@@ -740,8 +731,8 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
             // set owner id
             poi.owner_id = $scope.owner_id;
 
-            poi.coordinates_lat = String($scope.myMarkers[id].marker.position.lat());
-            poi.coordinates_lon = String($scope.myMarkers[id].marker.position.lng());
+            poi.coordinates_lat = String($scope.myMarkers[id].marker._latlng.lat);
+            poi.coordinates_lon = String($scope.myMarkers[id].marker._latlng.lng);
 
             poi.is_building_entrance = String(poi.is_building_entrance);
 
@@ -1415,3 +1406,4 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
 }
 ])
 ;
+/* End: PoiController.js */
