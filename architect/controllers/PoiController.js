@@ -91,7 +91,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
         for (var i = 0; i < $scope.myPois.length; i++) {
             var p = $scope.myPois[i];
             if (p && $scope.myPoisHashT[p.puid] && $scope.myPoisHashT[p.puid].marker) {
-                $scope.myPoisHashT[p.puid].marker.setMap(null);
+                $scope.markerGroup.removeLayer($scope.myPoisHashT[p.puid].marker._leaflet_id);
                 delete $scope.myPoisHashT[p.puid];
             }
         }
@@ -1141,10 +1141,10 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
         obj.password = $scope.creds.password;
         obj.owner_id = $scope.owner_id;
 
-        var latLng = marker.position;
-        if (latLng && latLng.lat() && latLng.lng()) {
-            obj.coordinates_lat = String(latLng.lat());
-            obj.coordinates_lon = String(latLng.lng());
+        var latLng = marker._latlng;
+        if (latLng && latLng.lat && latLng.lng) {
+            obj.coordinates_lat = String(latLng.lat);
+            obj.coordinates_lon = String(latLng.lng);
         }
 
         if (obj.is_building_entrance) {
@@ -1174,9 +1174,14 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
                             var pa = $scope.myConnectionsHashT[c].pois_a;
                             var pb = $scope.myConnectionsHashT[c].pois_b;
 
+                            // var flightPlanCoordinates = [
+                            //     new google.maps.LatLng($scope.myPoisHashT[pa].model.coordinates_lat, $scope.myPoisHashT[pa].model.coordinates_lon),
+                            //     new google.maps.LatLng($scope.myPoisHashT[pb].model.coordinates_lat, $scope.myPoisHashT[pb].model.coordinates_lon)
+                            // ];
+
                             var flightPlanCoordinates = [
-                                new google.maps.LatLng($scope.myPoisHashT[pa].model.coordinates_lat, $scope.myPoisHashT[pa].model.coordinates_lon),
-                                new google.maps.LatLng($scope.myPoisHashT[pb].model.coordinates_lat, $scope.myPoisHashT[pb].model.coordinates_lon)
+                                L.latLng($scope.myPoisHashT[pa].model.coordinates_lat, $scope.myPoisHashT[pa].model.coordinates_lon),
+                                L.latLng($scope.myPoisHashT[pb].model.coordinates_lat, $scope.myPoisHashT[pb].model.coordinates_lon)
                             ];
 
                             $scope.myConnectionsHashT[c].polyLine.setPath(flightPlanCoordinates);
