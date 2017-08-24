@@ -1,3 +1,5 @@
+/* Start: FloorController.js */
+
 app.controller('FloorController', ['$scope', 'AnyplaceService', 'GMapService', 'AnyplaceAPIService', function ($scope, AnyplaceService, GMapService, AnyplaceAPIService) {
     $scope.anyService = AnyplaceService;
     $scope.anyAPI = AnyplaceAPIService;
@@ -573,3 +575,4 @@ app.controller('FloorController', ['$scope', 'AnyplaceService', 'GMapService', '
     }
 }
 ]);
+/* End: FloorController.js */
