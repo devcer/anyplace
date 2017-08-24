@@ -1362,7 +1362,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
     };
 
     $scope.deleteTempPoi = function (i) {
-    	var myMarker = $scope.myMarkers[i];
+      var myMarker = $scope.myMarkers[i];
       if (!$scope.myMarkers || !$scope.myMarkers[i].marker) {
         _err("No valid POI marker to delete found.");
         return;
@@ -1381,7 +1381,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
     $("#draggable-poi").draggable({
         helper: 'clone',
         stop: function (e) {
-      		var point = L.point(e.pageX, e.pageY);
+          var point = L.point(e.pageX, e.pageY);
           var ll = GMapService.gmap.containerPointToLatLng(point);
             if (!_isPoiNearFloor(ll)) {
                 $scope.$apply(_warn("The marker was placed too far away from the selected building."));
@@ -1394,13 +1394,13 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
     $("#draggable-connector").draggable({
         helper: 'clone',
         stop: function (e) {
-        	var point = L.point(e.pageX, e.pageY);
+          var point = L.point(e.pageX, e.pageY);
           var ll = GMapService.gmap.containerPointToLatLng(point);
             if (!_isPoiNearFloor(ll)) {
                 $scope.$apply(_warn("The marker was placed too far away from the selected building."));
                 return;
             }
-	        $scope.placeMarker(ll, _POI_CONNECTOR_IMG, L.point(21, 21), 'connector');
+          $scope.placeMarker(ll, _POI_CONNECTOR_IMG, L.point(21, 21), 'connector');
         }
     });
 }
