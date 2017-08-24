@@ -304,7 +304,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
                     iconUrl: _POI_CONNECTOR_IMG,
                     iconSize: [21,21]
                 });
-                marker = L.marker([p.coordinates_lat,p.coordinates_lon],{icon: myIcon});
+                marker = L.marker([p.coordinates_lat,p.coordinates_lon],{icon: myIcon, draggable:true});
                 // marker = new google.maps.Marker({
                 //     position: _latLngFromPoi(p),
                 //     map: GMapService.gmap,
@@ -347,7 +347,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
                 //         size
                 //     )
                 // });
-                var marker = L.marker([p.coordinates_lat,p.coordinates_lon],{icon: myIcon});
+                var marker = L.marker([p.coordinates_lat,p.coordinates_lon],{icon: myIcon, draggable:true});
 
                 htmlContent = '<div class="infowindow-scroll-fix" ng-keydown="onInfoWindowKeyDown($event)">'
                     + '<form name="poiForm">'
