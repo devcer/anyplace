@@ -48,6 +48,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
         prev: undefined,
         next: undefined
     };
+    $scope.markerGroup = L.layerGroup().addTo(GMapService.gmap);
 
     $scope.orderByName = function (value) {
         return value.name;
@@ -324,18 +325,23 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
             var htmlContent = '-';
 
             if (p.pois_type == "None") {
-                marker = new google.maps.Marker({
-                    position: _latLngFromPoi(p),
-                    map: GMapService.gmap,
-                    draggable: true,
-                    icon: new google.maps.MarkerImage(
-                        _POI_CONNECTOR_IMG,
-                        null, /* size is determined at runtime */
-                        null, /* origin is 0,0 */
-                        null, /* anchor is bottom center of the scaled image */
-                        new google.maps.Size(21, 21)
-                    )
+                var myIcon = L.icon({
+                    iconUrl: _POI_CONNECTOR_IMG,
+                    iconSize: [21,21]
                 });
+                marker = L.marker([p.coordinates_lat,p.coordinates_lon],{icon: myIcon});
+                // marker = new google.maps.Marker({
+                //     position: _latLngFromPoi(p),
+                //     map: GMapService.gmap,
+                //     draggable: true,
+                //     icon: new google.maps.MarkerImage(
+                //         _POI_CONNECTOR_IMG,
+                //         null, /* size is determined at runtime */
+                //         null, /* origin is 0,0 */
+                //         null, /* anchor is bottom center of the scaled image */
+                //         new google.maps.Size(21, 21)
+                //     )
+                // });
 
                 htmlContent = '<div class="infowindow-scroll-fix" style="text-align: center; width:170px">'
                     + '<fieldset class="form-group" style="display: inline-block; width: 73%;">'
@@ -349,20 +355,24 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
                     + '</div>';
             } else {
                 var imgType = _POI_EXISTING_IMG;
-                var size = new google.maps.Size(21, 32);
-
-                marker = new google.maps.Marker({
-                    position: _latLngFromPoi(p),
-                    map: GMapService.gmap,
-                    draggable: true,
-                    icon: new google.maps.MarkerImage(
-                        imgType,
-                        null, /* size is determined at runtime */
-                        null, /* origin is 0,0 */
-                        null, /* anchor is bottom center of the scaled image */
-                        size
-                    )
+                // var size = new google.maps.Size(21, 32);
+                var myIcon = L.icon({
+                    iconUrl: imgType,
+                    iconSize: [21,32]
                 });
+                // marker = new google.maps.Marker({
+                //     position: _latLngFromPoi(p),
+                //     map: GMapService.gmap,
+                //     draggable: true,
+                //     icon: new google.maps.MarkerImage(
+                //         imgType,
+                //         null, /* size is determined at runtime */
+                //         null, /* origin is 0,0 */
+                //         null, /* anchor is bottom center of the scaled image */
+                //         size
+                //     )
+                // });
+                var marker = L.marker([p.coordinates_lat,p.coordinates_lon],{icon: myIcon});
 
                 htmlContent = '<div class="infowindow-scroll-fix" ng-keydown="onInfoWindowKeyDown($event)">'
                     + '<form name="poiForm">'
@@ -396,6 +406,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
 
             var tpl = $compile(htmlContent)($scope);
 
+            marker.addTo(markerGroup).bindPopup(tpl[0]);
             marker.tpl2 = tpl;
             marker.model = p;
 
@@ -1201,28 +1212,35 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
 
     $scope.placeMarker = function (location, iconImage, size, type) {
 
-        var marker = new google.maps.Marker({
-            position: location,
-            map: GMapService.gmap,
-            icon: new google.maps.MarkerImage(
-                iconImage,
-                null, /* size is determined at runtime */
-                null, /* origin is 0,0 */
-                null, /* anchor is bottom center of the scaled image */
-                size
-            ),
-            draggable: true
+        // var marker = new google.maps.Marker({
+        //     position: location,
+        //     map: GMapService.gmap,
+        //     icon: new google.maps.MarkerImage(
+        //         iconImage,
+        //         null,  size is determined at runtime 
+        //         null, /* origin is 0,0 */
+        //         null, /* anchor is bottom center of the scaled image */
+        //         size
+        //     ),
+        //     draggable: true
+        // });
+
+        var myIcon = L.icon({
+            iconUrl: iconImage,
+            iconSize: size
         });
+
+        var marker = L.marker([b.coordinates_lat,b.coordinates_lon],{icon: myIcon, draggable:true}).addTo(markerGroup);
 
         if (AnyplaceService.getBuildingId() === null || AnyplaceService.getBuildingId() === undefined) {
             _err("It seems there is no building selected. Please refresh.");
             return;
         }
 
-        var infowindow = new google.maps.InfoWindow({
-            content: '-',
-            maxWidth: 500
-        });
+        // var infowindow = new google.maps.InfoWindow({
+        //     content: '-',
+        //     maxWidth: 500
+        // });
 
         $scope.$apply(function () {
             marker.myId = $scope.myMarkerId;
@@ -1325,37 +1343,41 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
         if (type == 'poi') {
             var tpl = $compile(htmlContent)($scope);
             marker.tpl2 = $compile(htmlContent2)($scope);
-            infowindow.setContent(tpl[0]);
-            infowindow.open(GMapService.gmap, marker);
+            marker.bindPopup(tpl[0]).openPopup();
+            // infowindow.setContent(tpl[0]);
+            // infowindow.open(GMapService.gmap, marker);
         } else if (type == 'connector') {
             var tplConn = $compile(htmlConnector)($scope);
             marker.tpl2 = $compile(htmlConnector2)($scope);
-            infowindow.setContent(tplConn[0]);
+            marker.bindPopup(tplConn[0]).openPopup();
+            // infowindow.setContent(tplConn[0]);
             //infowindow.open(GMapService.gmap, marker);
 
             $scope.addPoi(marker.myId);
         }
 
-        $scope.$apply(
-            $scope.myMarkers[marker.myId].infowindow = infowindow
-        );
+        // $scope.$apply(
+        //     $scope.myMarkers[marker.myId].infowindow = infowindow
+        // );
 
-        google.maps.event.addListener(marker, 'click', function () {
-            if ($scope.edgeMode) {
-                $scope.$apply(_warn("Only submitted objects can be connected together."));
-            }
-            infowindow.open(GMapService.gmap, marker);
-        });
+        // google.maps.event.addListener(marker, 'click', function () {
+        //     if ($scope.edgeMode) {
+        //         $scope.$apply(_warn("Only submitted objects can be connected together."));
+        //     }
+        //     infowindow.open(GMapService.gmap, marker);
+        // });
 
 
     };
 
     $scope.deleteTempPoi = function (i) {
-        if (!$scope.myMarkers || !$scope.myMarkers[i].marker) {
-            _err("No valid POI marker to delete found.");
-            return;
-        }
-        $scope.myMarkers[i].marker.setMap(null);
+    	var myMarker = $scope.myMarkers[i];
+      if (!$scope.myMarkers || !$scope.myMarkers[i].marker) {
+        _err("No valid POI marker to delete found.");
+        return;
+      }
+      // $scope.myMarkers[i].marker.setMap(null);
+      $scope.markerGroup.removeLayer(myMarker.marker._leaflet_id);
     };
 
     $scope.toggleEdgeMode = function () {
@@ -1368,26 +1390,26 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
     $("#draggable-poi").draggable({
         helper: 'clone',
         stop: function (e) {
-            var point = new google.maps.Point(e.pageX, e.pageY);
-            var ll = overlay.getProjection().fromContainerPixelToLatLng(point);
+      		var point = L.point(e.pageX, e.pageY);
+          var ll = GMapService.gmap.containerPointToLatLng(point);
             if (!_isPoiNearFloor(ll)) {
                 $scope.$apply(_warn("The marker was placed too far away from the selected building."));
                 return;
             }
-            $scope.placeMarker(ll, _POI_NEW_IMG, new google.maps.Size(21, 32), 'poi');
+            $scope.placeMarker(ll, _POI_NEW_IMG, L.point(21, 32), 'poi');
         }
     });
 
     $("#draggable-connector").draggable({
         helper: 'clone',
         stop: function (e) {
-            var point = new google.maps.Point(e.pageX, e.pageY);
-            var ll = overlay.getProjection().fromContainerPixelToLatLng(point);
+        	var point = L.point(e.pageX, e.pageY);
+          var ll = GMapService.gmap.containerPointToLatLng(point);
             if (!_isPoiNearFloor(ll)) {
                 $scope.$apply(_warn("The marker was placed too far away from the selected building."));
                 return;
             }
-            $scope.placeMarker(ll, _POI_CONNECTOR_IMG, new google.maps.Size(21, 21), 'connector');
+	        $scope.placeMarker(ll, _POI_CONNECTOR_IMG, L.point(21, 21), 'connector');
         }
     });
 }
