@@ -74,9 +74,10 @@ app.controller('FloorController', ['$scope', 'AnyplaceService', 'GMapService', '
   $scope.$watch('anyService.selectedFloor', function (newVal, oldVal) {
     if (newVal !== undefined && newVal !== null) {
       $scope.fetchFloorPlanOverlay(newVal);
-      GMapService.gmap.panTo(_latLngFromBuilding($scope.anyService.selectedBuilding));
-      GMapService.gmap.setZoom(19);
-
+      // GMapService.gmap.panTo(_latLngFromBuilding($scope.anyService.selectedBuilding));
+      // GMapService.gmap.setZoom(19);
+      $scope.gmapService.gmap.setView(_latLngFromBuilding($scope.anyService.selectedBuilding), 19);
+      
       if (heatmap)
         heatmap.setMap(null);
 
@@ -177,9 +178,10 @@ app.controller('FloorController', ['$scope', 'AnyplaceService', 'GMapService', '
 
         // load the correct coordinates from the selected floor
         var fl = $scope.anyService.selectedFloor;
-        var imageBounds = new google.maps.LatLngBounds(
-          new google.maps.LatLng(fl.bottom_left_lat, fl.bottom_left_lng),
-          new google.maps.LatLng(fl.top_right_lat, fl.top_right_lng));
+        /* needs testing*/
+        var imageBounds = L.latLngBounds(
+          L.latLng(fl.bottom_left_lat, fl.bottom_left_lng),
+          L.latLng(fl.top_right_lat, fl.top_right_lng));
 
         $scope.data.floor_plan_groundOverlay = new USGSOverlay(imageBounds, "data:image/png;base64," + data, GMapService.gmap);
 
@@ -552,7 +554,7 @@ app.controller('FloorController', ['$scope', 'AnyplaceService', 'GMapService', '
         while (i--) {
           var rp = resp.data.radioPoints[i];
           heatMapData.push(
-            {location: new google.maps.LatLng(rp.x, rp.y), weight: 1}
+            {location: L.latLng(rp.x, rp.y), weight: 1}
           );
           resp.data.radioPoints.splice(i, 1);
         }

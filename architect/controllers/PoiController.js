@@ -195,18 +195,18 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
                 }
 
                 var flightPlanCoordinates = [
-                    new google.maps.LatLng($scope.myPoisHashT[conn.pois_a].model.coordinates_lat, $scope.myPoisHashT[conn.pois_a].model.coordinates_lon),
-                    new google.maps.LatLng($scope.myPoisHashT[conn.pois_b].model.coordinates_lat, $scope.myPoisHashT[conn.pois_b].model.coordinates_lon)
+                    L.latLng($scope.myPoisHashT[conn.pois_a].model.coordinates_lat, $scope.myPoisHashT[conn.pois_a].model.coordinates_lon),
+                    L.latLng($scope.myPoisHashT[conn.pois_b].model.coordinates_lat, $scope.myPoisHashT[conn.pois_b].model.coordinates_lon)
                 ];
-
-                var flightPath = new google.maps.Polyline({
-                    path: flightPlanCoordinates,
-                    strokeColor: "#0000FF",
-                    strokeOpacity: 0.5,
-                    strokeWeight: 4
+                /* need testing */
+                var flightPath =  L.polyline(
+                    path: flightPlanCoordinates,{
+                    color: "#0000FF",
+                    opacity: 0.5,
+                    weight: 4
                 });
 
-                flightPath.setMap(GMapService.gmap);
+                flightPath.addTo($scope.gmapService.gmap);
                 flightPath.model = conn;
 
                 $scope.myConnectionsHashT[cuid].polyLine = flightPath;
@@ -273,10 +273,10 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
 
     $scope.drawPoisOnMap = function () {
 
-        var infowindow = new google.maps.InfoWindow({
-            content: '-',
-            maxWidth: 500
-        });
+        // var infowindow = new google.maps.InfoWindow({
+        //     content: '-',
+        //     maxWidth: 500
+        // });
 
         var localPuid = undefined;
         var localPoiIndex = -1;
@@ -413,15 +413,16 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
                             $scope.connectPois.prev.setIcon(_getNormalPoiIconNormal());
                         }
 
-                        var flightPath = new google.maps.Polyline({
-                            path: [this.position, $scope.connectPois.prev.position],
+                        /*needs testing, need to include geodesic*/
+                        var flightPath = L.polyline(
+                            [this.position, $scope.connectPois.prev.position],{
                             geodesic: true,
-                            strokeColor: '#FF0000',
-                            strokeOpacity: 0.5,
-                            strokeWeight: 4
+                            color: '#FF0000',
+                            opacity: 0.5,
+                            weight: 4
                         });
 
-                        flightPath.setMap(GMapService.gmap);
+                        flightPath.addTo($scope.gmapService.gmap);
 
                         // Construct the request
                         var poiA = $scope.connectPois.prev.model;
@@ -467,11 +468,13 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
                                 var cloneModel = flightPath.model;
                                 cloneModel.polyLine = flightPath;
                                 $scope.myConnectionsHashT[cuid] = cloneModel;
+                                /*needs testing*/
 
-                                flightPath.setOptions({
-                                    strokeColor: '#0000FF',
-                                    strokeOpacity: 0.5
-                                });
+                                L.setOptions(flightPath,{color: '#0000FF',opacity: 0.5});
+                                // flightPath.setOptions({
+                                //     strokeColor: '#0000FF',
+                                //     strokeOpacity: 0.5
+                                // });
 
                                 google.maps.event.addListener(flightPath, 'click', function () {
                                     $scope.$apply(_deleteConnection(this));
@@ -828,15 +831,16 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
                                         $scope.connectPois.prev.setIcon(_getNormalPoiIconNormal());
                                     }
 
-                                    var flightPath = new google.maps.Polyline({
-                                        path: [this.position, $scope.connectPois.prev.position],
+                                    /*needs testing, replace position*/
+                                    var flightPath = L.polyline(
+                                        [this.position, $scope.connectPois.prev.position],{
                                         geodesic: true,
-                                        strokeColor: '#FF0000',
-                                        strokeOpacity: 0.5,
-                                        strokeWeight: 4
+                                        color: '#FF0000',
+                                        opacity: 0.5,
+                                        weight: 4
                                     });
 
-                                    flightPath.setMap(GMapService.gmap);
+                                    flightPath.setMap($scope.gmapService.gmap);
 
                                     // Construct the request
                                     var poiA = $scope.connectPois.prev.model;
@@ -883,10 +887,13 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
                                             cloneModel.polyLine = flightPath;
                                             $scope.myConnectionsHashT[cuid] = cloneModel;
 
-                                            flightPath.setOptions({
-                                                strokeColor: '#0000FF',
-                                                strokeOpacity: 0.5
-                                            });
+                                            L.setOptions(flightPath,{color: '#0000FF',opacity: 0.5});
+
+
+                                            // flightPath.setOptions({
+                                            //     strokeColor: '#0000FF',
+                                            //     strokeOpacity: 0.5
+                                            // });
 
                                             google.maps.event.addListener(flightPath, 'click', function () {
                                                 $scope.$apply(_deleteConnection(this));
