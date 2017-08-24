@@ -200,7 +200,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
                 ];
                 /* need testing */
                 var flightPath =  L.polyline(
-                    path: flightPlanCoordinates,{
+                    flightPlanCoordinates,{
                     color: "#0000FF",
                     opacity: 0.5,
                     weight: 4
