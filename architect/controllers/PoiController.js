@@ -245,8 +245,8 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
     var _isPoiNearFloor = function (coords) {
         var D = 0.001;
 
-        var pLat = coords.lat();
-        var pLng = coords.lng();
+        var pLat = coords.lat;
+        var pLng = coords.lng;
 
 
         var floor = $scope.anyService.getFloor();
@@ -382,7 +382,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
 
             var tpl = $compile(htmlContent)($scope);
 
-            marker.addTo(markerGroup).bindPopup(tpl[0]);
+            marker.addTo($scope.markerGroup).bindPopup(tpl[0]);
             marker.tpl2 = tpl;
             marker.model = p;
 
@@ -792,10 +792,11 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
 
                         $scope.myMarkers[id].model = poi;
 
-                        if ($scope.myMarkers[id].infowindow) {
-                            $scope.myMarkers[id].infowindow.close();
-                            $scope.myMarkers[id].infowindow.setContent($scope.myMarkers[id].marker.tpl2[0]);
-                        }
+                        // if ($scope.myMarkers[id].infowindow) {
+                        //     $scope.myMarkers[id].infowindow.close();
+                        //     $scope.myMarkers[id].infowindow.setContent($scope.myMarkers[id].marker.tpl2[0]);
+                        // }
+                        $scope.myMarkers[id].marker.bindPopup($scope.myMarkers[id].marker.tpl2[0]);
 
                         $scope.myMarkers[id].marker.model = poi;
 
@@ -1234,7 +1235,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
             iconSize: size
         });
 
-        var marker = L.marker([b.coordinates_lat,b.coordinates_lon],{icon: myIcon, draggable:true}).addTo(markerGroup);
+        var marker = L.marker([location.lat,location.lng],{icon: myIcon, draggable:true}).addTo($scope.markerGroup);
 
         if (AnyplaceService.getBuildingId() === null || AnyplaceService.getBuildingId() === undefined) {
             _err("It seems there is no building selected. Please refresh.");
@@ -1395,7 +1396,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
         helper: 'clone',
         stop: function (e) {
           var point = L.point(e.pageX, e.pageY);
-          var ll = GMapService.gmap.containerPointToLatLng(point);
+          var ll = $scope.gmapService.gmap.containerPointToLatLng(point);
             if (!_isPoiNearFloor(ll)) {
                 $scope.$apply(_warn("The marker was placed too far away from the selected building."));
                 return;
@@ -1408,7 +1409,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
         helper: 'clone',
         stop: function (e) {
           var point = L.point(e.pageX, e.pageY);
-          var ll = GMapService.gmap.containerPointToLatLng(point);
+          var ll = $scope.gmapService.gmap.containerPointToLatLng(point);
             if (!_isPoiNearFloor(ll)) {
                 $scope.$apply(_warn("The marker was placed too far away from the selected building."));
                 return;
