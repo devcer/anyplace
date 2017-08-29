@@ -30,6 +30,7 @@ app.service('GMapService', function () {
         id: 'mapbox.streets',
         accessToken: 'pk.eyJ1Ijoidmlzd2FuYXRoYW1zYW50b3NoIiwiYSI6ImNqNHdkbmlnOTEycTQyd3BsM25jNzYzdXQifQ._PKhrQU1f83K0G7lpRVDtw'
     }).addTo(self.gmap);
+
     console.log("Hello World");
     
     // Initialize search box for places

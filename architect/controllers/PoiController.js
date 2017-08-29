@@ -386,11 +386,11 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
       marker.tpl2 = tpl;
       marker.model = p;
 
-      marker.infowindow = infowindow;
+      // marker.infowindow = infowindow;
 
       $scope.myPoisHashT[p.puid].marker = marker;
 
-      google.maps.event.addListener(marker, 'click', function () {
+      marker.on('click', function (e){
 
         if ($scope.edgeMode) {
           if ($scope.connectPois.prev) {
@@ -514,7 +514,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
         }
       });
 
-      google.maps.event.addListener(marker, "dragend", function (event) {
+      marker.on("dragend", function (event) {
         if (this.model && this.model.puid) {
           $scope.updatePoiPosition(this);
         }
@@ -1079,10 +1079,11 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
 
     var marker = bobj.marker;
     if (marker) {
-      var latLng = marker.position;
-      if (latLng && latLng.lat() && latLng.lng()) {
-        obj.coordinates_lat = String(latLng.lat());
-        obj.coordinates_lon = String(latLng.lng());
+      // var latLng = marker.position;
+      var latLng = marker._latlng;
+      if (latLng && latLng.lat && latLng.lng) {
+        obj.coordinates_lat = String(latLng.lat);
+        obj.coordinates_lon = String(latLng.lng);
       }
     }
 
@@ -1100,7 +1101,8 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
         var data = resp.data;
 
         if (marker) {
-          marker.infowindow.setMap(null);
+          // marker.infowindow.setMap(null);
+          marker.remove();
         }
 
         if (obj.is_building_entrance == 'true') {
