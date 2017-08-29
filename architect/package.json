@@ -8,6 +8,8 @@
         "grunt-contrib-cssmin": "~0.12.2",
         "grunt-contrib-imagemin": "latest",
         "grunt-contrib-uglify": "~0.9.1",
-        "grunt-contrib-watch": "~0.6.1"
+        "grunt-contrib-watch": "~0.6.1",
+        "font-awesome": "^4.2.0",
+        "leaflet-toolbar": "git+https://github.com/Leaflet/Leaflet.toolbar.git"
     }
 }
