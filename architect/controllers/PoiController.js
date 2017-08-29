@@ -62,9 +62,11 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
         GMapService.gmap.setView(_latLngFromPoi(newVal), 19);
         if (newVal.puid) {
           var marker = $scope.myPoisHashT[newVal.puid].marker;
-          if (marker && marker.infowindow && marker.tpl2) {
-            marker.infowindow.setContent(marker.tpl2[0]);
-            marker.infowindow.open(GMapService.gmap, marker);
+          // if (marker && marker.infowindow && marker.tpl2) {
+          if (marker && marker.tpl2) {
+            // marker.infowindow.setContent(marker.tpl2[0]);
+            // marker.infowindow.open(GMapService.gmap, marker);
+            marker.bindPopup(marker.tpl2[0]).addTo($scope.markerGroup);
           }
 
           if (typeof(Storage) !== "undefined" && localStorage) {
@@ -225,7 +227,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
 
   var _latLngFromPoi = function (p) {
     if (p && p.coordinates_lat && p.coordinates_lon) {
-      return [parseFloat(p.coordinates_lat), parseFloat(p.coordinates_lon)]
+      return L.latLng(parseFloat(p.coordinates_lat), parseFloat(p.coordinates_lon));
     }
     return undefined;
   };
@@ -810,7 +812,8 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
 
             var infowindow = $scope.myMarkers[id].infowindow;
 
-            google.maps.event.addListener($scope.myMarkers[id].marker, 'click', function () {
+            // google.maps.event.addListener($scope.myMarkers[id].marker, 'click', function () {
+            $scope.myMarkers[id].marker.on( 'click', function () {
               if ($scope.edgeMode) {
                 if ($scope.connectPois.prev) {
 
@@ -931,7 +934,8 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
               }
             });
 
-            google.maps.event.addListener($scope.myMarkers[id].marker, "dragend", function (event) {
+            // google.maps.event.addListener($scope.myMarkers[id].marker, "dragend", function (event) {
+            $scope.myMarkers[id].marker.on("dragend", function (event) {
               if (this.model && this.model.puid) {
                 $scope.updatePoiPosition(this);
               }

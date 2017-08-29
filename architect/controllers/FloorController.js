@@ -168,13 +168,13 @@ app.controller('FloorController', ['$scope', 'AnyplaceService', 'GMapService', '
 
         $scope.data.floor_plan_file = null;
         $scope.data.floor_plan = null;
-        if ($scope.data.floor_plan_groundOverlay != null) {
-          $scope.data.floor_plan_groundOverlay.setMap(null);
-          $scope.data.floor_plan_groundOverlay = null;
-        }
-
+        // if ($scope.data.floor_plan_groundOverlay != null) {
+        //   $scope.data.floor_plan_groundOverlay.setMap(null);
+        //   $scope.data.floor_plan_groundOverlay = null;
+        // }
+        /* Needs testing */
         // on success
-        var data = resp.data;
+        var data = "data:image/jpeg;base64,"+resp.data.split('base64')[1];
 
         // load the correct coordinates from the selected floor
         var fl = $scope.anyService.selectedFloor;
@@ -217,6 +217,7 @@ app.controller('FloorController', ['$scope', 'AnyplaceService', 'GMapService', '
       imgObj.onload = function () {
         // canvasOverlay = new CanvasOverlay(imgObj, GMapService.gmap);
         var imageBounds = L.latLngBounds(L.latLng(parseFloat($scope.anyService.selectedBuilding.coordinates_lat),parseFloat($scope.anyService.selectedBuilding.coordinates_lon)), L.latLng(parseFloat($scope.anyService.selectedBuilding.coordinates_lat)-0.0002,parseFloat($scope.anyService.selectedBuilding.coordinates_lon)+0.0004));
+        
         var imgCorners=[
           imageBounds.getNorthWest(),
           imageBounds.getNorthEast(),
@@ -231,7 +232,7 @@ app.controller('FloorController', ['$scope', 'AnyplaceService', 'GMapService', '
 
         L.DomEvent.on(canvasOverlay._image, 'load', canvasOverlay.editing.enable, canvasOverlay.editing);
         $scope.$apply($scope.isCanvasOverlayActive = true);
-      
+        
         console.log("image loaded");
         // hide previous floorplan
         // if ($scope.data.floor_plan_groundOverlay && $scope.data.floor_plan_groundOverlay.getMap()) {
@@ -292,7 +293,8 @@ app.controller('FloorController', ['$scope', 'AnyplaceService', 'GMapService', '
     // canvasOverlay.setMap(null); // remove the canvas overlay since the groundoverlay is placed
     $('#input-floor-plan').prop('disabled', false);
     $('#input-floor-plan').prop('value', '');
-    $scope.isCanvasOverlayActive = false;
+    // $scope.isCanvasOverlayActive = false;
+    $scope.$apply($scope.isCanvasOverlayActive = false);
 
     if (_floorNoExists($scope.newFloorNumber)) {
       for (var i = 0; i < $scope.xFloors.length; i++) {
@@ -378,16 +380,17 @@ app.controller('FloorController', ['$scope', 'AnyplaceService', 'GMapService', '
     }
 
 
-    if ($scope.data.floor_plan_groundOverlay) {
-      $scope.data.floor_plan_groundOverlay.setMap($scope.gmapService.gmap);
-    }
+    // if ($scope.data.floor_plan_groundOverlay) {
+    //   $scope.data.floor_plan_groundOverlay.setMap($scope.gmapService.gmap);
+    // }
 
     var x = $('#input-floor-plan');
     x.replaceWith(x = x.clone(true));
 
     x.prop('disabled', false);
     x.prop('value','');
-    $scope.isCanvasOverlayActive = false;
+    // $scope.isCanvasOverlayActive = false;
+    $scope.$apply($scope.isCanvasOverlayActive = false);
   };
 
   $scope.deleteFloor = function () {
@@ -423,10 +426,10 @@ app.controller('FloorController', ['$scope', 'AnyplaceService', 'GMapService', '
           }
         }
 
-        if ($scope.data.floor_plan_groundOverlay != null) {
-          $scope.data.floor_plan_groundOverlay.setMap(null);
-          $scope.data.floor_plan_groundOverlay = null;
-        }
+        // if ($scope.data.floor_plan_groundOverlay != null) {
+        //   $scope.data.floor_plan_groundOverlay.setMap(null);
+        //   $scope.data.floor_plan_groundOverlay = null;
+        // }
 
         if ($scope.xFloors && $scope.xFloors.length > 0) {
           $scope.anyService.selectedFloor = $scope.xFloors[0];
