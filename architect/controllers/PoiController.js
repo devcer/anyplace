@@ -83,7 +83,8 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
       if ($scope.anyService.selectedPoi) {
         var p = $scope.anyService.selectedPoi;
         if ($scope.myPoisHashT[p.puid] && $scope.myPoisHashT[p.puid].marker && $scope.myPoisHashT[p.puid].marker.infowindow) {
-          $scope.myPoisHashT[p.puid].marker.infowindow.setMap(null);
+          // $scope.myPoisHashT[p.puid].marker.infowindow.setMap(null);
+          $scope.markerGroup.removeLayer($scope.myPoisHashT[p.puid].marker._leaflet_id);
         }
       }
     }
@@ -208,7 +209,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
           weight: 4
         });
 
-        flightPath.addTo($scope.gmapService.gmap);
+        flightPath.addTo($scope.markerGroup);
         flightPath.model = conn;
 
         $scope.myConnectionsHashT[cuid].polyLine = flightPath;
@@ -424,7 +425,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
               weight: 4
             });
 
-            flightPath.addTo($scope.gmapService.gmap);
+            flightPath.addTo($scope.markerGroup);
 
             // Construct the request
             var poiA = $scope.connectPois.prev.model;
@@ -505,8 +506,8 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
           }
 
         } else {
-          infowindow.setContent(this.tpl2[0]);
-          infowindow.open(GMapService.gmap, this);
+          // infowindow.setContent(this.tpl2[0]);
+          // infowindow.open(GMapService.gmap, this);
           var self = this;
           $scope.$apply(function () {
             if (self.model && self.model.puid) {
@@ -810,7 +811,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
 
             google.maps.event.clearListeners($scope.myMarkers[id].marker, 'click');
 
-            var infowindow = $scope.myMarkers[id].infowindow;
+            // var infowindow = $scope.myMarkers[id].infowindow;
 
             // google.maps.event.addListener($scope.myMarkers[id].marker, 'click', function () {
             $scope.myMarkers[id].marker.on( 'click', function () {
@@ -923,8 +924,8 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
                   }
                 }
               } else {
-                infowindow.setContent(this.tpl2[0]);
-                infowindow.open(GMapService.gmap, this);
+                // infowindow.setContent(this.tpl2[0]);
+                // infowindow.open(GMapService.gmap, this);
                 var self = this;
                 $scope.$apply(function () {
                   if (self.model && self.model.puid) {
@@ -1026,7 +1027,8 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
             lp.splice(i, 1); // delete the pois from the loadPois list
 
             if ($scope.myPoisHashT[delPuid] && $scope.myPoisHashT[delPuid].marker) {
-              $scope.myPoisHashT[delPuid].marker.setMap(null);
+              $scope.markerGroup.removeLayer($scope.myPoisHashT[delPuid].marker._leaflet_id);
+              // $scope.myPoisHashT[delPuid].marker.setMap(null);
             }
             delete $scope.myPoisHashT[delPuid]; // delete the POIS from the hashtable
             break;
@@ -1045,7 +1047,8 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
             lp.splice(i, 1); // delete the pois from the loadPois list
 
             if ($scope.myPoisHashT[delPuid] && $scope.myPoisHashT[delPuid].marker) {
-              $scope.myPoisHashT[delPuid].marker.setMap(null);
+              $scope.markerGroup.removeLayer($scope.myPoisHashT[delPuid].marker._leaflet_id);              
+              // $scope.myPoisHashT[delPuid].marker.setMap(null);
             }
             delete $scope.myPoisHashT[delPuid]; // delete the POIS from the hashtable
             break;
@@ -1214,7 +1217,8 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
 
   $scope.removeMarker = function (id) {
     if ($scope.myMarkers[id]) {
-      $scope.myMarkers[id].marker.setMap(null);
+      $scope.markerGroup.removeLayer($scope.myMarkers[id].marker._leaflet_id);
+      // $scope.myMarkers[id].marker.setMap(null);
       delete $scope.myMarkers[id];
     } else {
       _err("It seems that the marker to be deleted does not exist.");
