@@ -59,7 +59,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
       if (newVal) {
         // GMapService.gmap.panTo(_latLngFromPoi(newVal));
         //GMapService.gmap.setZoom(19);
-        GMapService.gmap.setView(_latLngFromPoi(newVal), 19);
+        $scope.gmapService.gmap.setView(_latLngFromPoi(newVal), 19);
         if (newVal.puid) {
           var marker = $scope.myPoisHashT[newVal.puid].marker;
           // if (marker && marker.infowindow && marker.tpl2) {
@@ -82,9 +82,11 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
     if (e.keyCode == 27) {
       if ($scope.anyService.selectedPoi) {
         var p = $scope.anyService.selectedPoi;
-        if ($scope.myPoisHashT[p.puid] && $scope.myPoisHashT[p.puid].marker && $scope.myPoisHashT[p.puid].marker.infowindow) {
-          // $scope.myPoisHashT[p.puid].marker.infowindow.setMap(null);
-          $scope.markerGroup.removeLayer($scope.myPoisHashT[p.puid].marker._leaflet_id);
+        // if ($scope.myPoisHashT[p.puid] && $scope.myPoisHashT[p.puid].marker && $scope.myPoisHashT[p.puid].marker.infowindow) {
+        //   $scope.myPoisHashT[p.puid].marker.infowindow.setMap(null);
+        // }
+        if ($scope.myPoisHashT[p.puid] && $scope.myPoisHashT[p.puid].marker) {
+          $scope.myPoisHashT[p.puid].marker.closePopup();
         }
       }
     }
@@ -104,7 +106,8 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
     if ($scope.myConnectionsHashT) {
       for (var con in $scope.myConnectionsHashT) {
         if (con && $scope.myConnectionsHashT.hasOwnProperty(con) && $scope.myConnectionsHashT[con] && $scope.myConnectionsHashT[con].polyLine) {
-          $scope.myConnectionsHashT[con].polyLine.setMap(null);
+          // $scope.myConnectionsHashT[con].polyLine.setMap(null);
+          $scope.myConnectionsHashT[con].polyLine.remove();
         }
       }
     }
@@ -151,7 +154,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
     }
 
     if ($scope.myPois.length == 0) {
-      // _err("This floor is empty.");
+      _err("This floor is empty.");
       return;
     }
 
@@ -214,10 +217,9 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
 
         $scope.myConnectionsHashT[cuid].polyLine = flightPath;
 
-        google.maps.event.addListener(flightPath, 'click', function () {
+        flightPath.on( 'click', function () {
           $scope.$apply(_deleteConnection(this));
         });
-
       }
     }
   };
@@ -308,7 +310,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
           iconUrl: _POI_CONNECTOR_IMG,
           iconSize: [21,21]
         });
-        marker = L.marker([p.coordinates_lat,p.coordinates_lon],{icon: myIcon, draggable:true});
+        marker = L.marker(L.latLng(p.coordinates_lat,p.coordinates_lon),{icon: myIcon, draggable:true});
         // marker = new google.maps.Marker({
         //     position: _latLngFromPoi(p),
         //     map: GMapService.gmap,
@@ -351,7 +353,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
         //         size
         //     )
         // });
-        var marker = L.marker([p.coordinates_lat,p.coordinates_lon],{icon: myIcon, draggable:true});
+        var marker = L.marker(L.latLng(p.coordinates_lat,p.coordinates_lon),{icon: myIcon, draggable:true});
 
         htmlContent = '<div class="infowindow-scroll-fix" ng-keydown="onInfoWindowKeyDown($event)">'
           + '<form name="poiForm">'
@@ -417,9 +419,9 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
             }
 
             /*needs testing, need to include geodesic*/
+            /*add geodesic: true later*/
             var flightPath = L.polyline(
-              [this.position, $scope.connectPois.prev.position],{
-              geodesic: true,
+              [this._latlng, $scope.connectPois.prev._latlng],{
               color: '#FF0000',
               opacity: 0.5,
               weight: 4
@@ -471,15 +473,14 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
                 var cloneModel = flightPath.model;
                 cloneModel.polyLine = flightPath;
                 $scope.myConnectionsHashT[cuid] = cloneModel;
-                /*needs testing*/
-
-                L.setOptions(flightPath,{color: '#0000FF',opacity: 0.5});
+                
+                flightPath.setStyle({color: '#0000FF',opacity: 0.5});
                 // flightPath.setOptions({
                 //     strokeColor: '#0000FF',
                 //     strokeOpacity: 0.5
                 // });
 
-                google.maps.event.addListener(flightPath, 'click', function () {
+                flightPath.on( 'click', function () {
                   $scope.$apply(_deleteConnection(this));
                 });
 
@@ -487,9 +488,10 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
               function (resp) {
                 var data = resp.data;
                 _err("Something went wrong while attempting to connect the two POIs.");
-                flightPath.setMap(null);
+                /*needs testing*/
+                flightPath.remove();
               }
-            );
+            );  
 
             $scope.connectPois.prev = undefined;
 
@@ -506,6 +508,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
           }
 
         } else {
+          /*Needs to add?*/
           // infowindow.setContent(this.tpl2[0]);
           // infowindow.open(GMapService.gmap, this);
           var self = this;
@@ -541,7 +544,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
     // )
     return L.icon({
       iconUrl: _POI_CONNECTOR_IMG,
-      iconSize: [41, 41]
+      iconSize: L.point(41, 41)
     });
   };
 
@@ -555,7 +558,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
     // )
     return L.icon({
     iconUrl: _POI_CONNECTOR_IMG,
-    iconSize: [21, 21]
+    iconSize: L.point(21, 21)
     });
   };
 
@@ -569,7 +572,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
     // )
     return L.icon({
     iconUrl: _POI_EXISTING_IMG,
-    iconSize: [31, 48]
+    iconSize: L.point(31, 48)
     });
   };
 
@@ -583,7 +586,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
     // )
     return L.icon({
     iconUrl: _POI_EXISTING_IMG,
-    iconSize: [21, 32]
+    iconSize: L.point(21, 32)
     });
   };
 
@@ -656,7 +659,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
     }
 
     // visually remove it immediately, on failure we restore it.
-    fp.setMap(null);
+    fp.remove();
 
     // TODO: Figure proper data structures for two way data hold.
     var temp = fp.model.polyLine;
@@ -673,7 +676,8 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
       },
       function (resp) {
         var data = resp.data;
-        fp.setMap(GMapService.gmap);
+        // fp.setMap(GMapService.gmap);
+        fp.addTo($scope.markerGroup);
         fp.model.polyLine = temp;
         _err("Something went wrong. Connection could not be deleted.");
       }
@@ -799,8 +803,9 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
             //     $scope.myMarkers[id].infowindow.close();
             //     $scope.myMarkers[id].infowindow.setContent($scope.myMarkers[id].marker.tpl2[0]);
             // }
-            $scope.myMarkers[id].marker.bindPopup($scope.myMarkers[id].marker.tpl2[0]);
-
+            if ($scope.myMarkers[id].marker){
+             $scope.myMarkers[id].marker.bindPopup($scope.myMarkers[id].marker.tpl2[0]);
+            }
             $scope.myMarkers[id].marker.model = poi;
 
             if ($scope.myMarkers[id].marker.model.pois_type == "None") {
@@ -809,7 +814,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
               $scope.myMarkers[id].marker.setIcon(_getNormalPoiIconNormal());
             }
 
-            google.maps.event.clearListeners($scope.myMarkers[id].marker, 'click');
+            // google.maps.event.clearListeners($scope.myMarkers[id].marker, 'click');
 
             // var infowindow = $scope.myMarkers[id].infowindow;
 
@@ -836,16 +841,16 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
                     $scope.connectPois.prev.setIcon(_getNormalPoiIconNormal());
                   }
 
-                  /*needs testing, replace position*/
+                  /*needs testing*/
+                  /* add  geodesic: true below*/
                   var flightPath = L.polyline(
-                    [this.position, $scope.connectPois.prev.position],{
-                    geodesic: true,
+                    [this._latlng, $scope.connectPois.prev._latlng],{
                     color: '#FF0000',
                     opacity: 0.5,
                     weight: 4
                   });
 
-                  flightPath.setMap($scope.gmapService.gmap);
+                  flightPath.addTo($scope.markerGroup);
 
                   // Construct the request
                   var poiA = $scope.connectPois.prev.model;
@@ -892,15 +897,14 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
                       cloneModel.polyLine = flightPath;
                       $scope.myConnectionsHashT[cuid] = cloneModel;
 
-                      L.setOptions(flightPath,{color: '#0000FF',opacity: 0.5});
-
+                      flightPath.setStyle({color: '#0000FF',opacity: 0.5});
 
                       // flightPath.setOptions({
                       //     strokeColor: '#0000FF',
                       //     strokeOpacity: 0.5
                       // });
 
-                      google.maps.event.addListener(flightPath, 'click', function () {
+                      flightPath.on('click', function () {
                         $scope.$apply(_deleteConnection(this));
                       });
 
@@ -908,7 +912,8 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
                     function (resp) {
                       var data = resp.data;
                       _err("Something went wrong while attempting to connect the two POIs.");
-                      flightPath.setMap(null);
+                      // flightPath.setMap(null);
+                      flightPath.remove();
                     }
                   );
 
@@ -1127,11 +1132,13 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
               var pb = $scope.myConnectionsHashT[c].pois_b;
 
               var flightPlanCoordinates = [
-                new google.maps.LatLng($scope.myPoisHashT[pa].model.coordinates_lat, $scope.myPoisHashT[pa].model.coordinates_lon),
-                new google.maps.LatLng($scope.myPoisHashT[pb].model.coordinates_lat, $scope.myPoisHashT[pb].model.coordinates_lon)
+                L.latLng($scope.myPoisHashT[pa].model.coordinates_lat, $scope.myPoisHashT[pa].model.coordinates_lon),
+                L.latLng($scope.myPoisHashT[pb].model.coordinates_lat, $scope.myPoisHashT[pb].model.coordinates_lon)
               ];
 
-              $scope.myConnectionsHashT[c].polyLine.setPath(flightPlanCoordinates);
+              // $scope.myConnectionsHashT[c].polyLine.setPath(flightPlanCoordinates);
+              /*needs testing*/
+              $scope.myConnectionsHashT[c].polyLine.setLatLngs(flightPlanCoordinates);
             }
           }
         }
@@ -1201,7 +1208,8 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
                 L.latLng($scope.myPoisHashT[pb].model.coordinates_lat, $scope.myPoisHashT[pb].model.coordinates_lon)
               ];
 
-              $scope.myConnectionsHashT[c].polyLine.setPath(flightPlanCoordinates);
+              // $scope.myConnectionsHashT[c].polyLine.setPath(flightPlanCoordinates);
+              $scope.myConnectionsHashT[c].polyLine.setLatLngs(flightPlanCoordinates);
             }
           }
         }
@@ -1243,6 +1251,7 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
     var myIcon = L.icon({
       iconUrl: iconImage,
       iconSize: size
+      // ,iconAnchor: [5, 55]
     });
 
     var marker = L.marker([location.lat,location.lng],{icon: myIcon, draggable:true}).addTo($scope.markerGroup);
@@ -1381,6 +1390,12 @@ app.controller('PoiController', ['$scope', '$compile', 'GMapService', 'AnyplaceS
     //     }
     //     infowindow.open(GMapService.gmap, marker);
     // });
+    marker.on('click', function () {
+      if ($scope.edgeMode) {
+        $scope.$apply(_warn("Only submitted objects can be connected together."));
+      }
+      // infowindow.open(GMapService.gmap, marker);
+    });
 
 
   };

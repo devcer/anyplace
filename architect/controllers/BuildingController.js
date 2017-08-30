@@ -89,10 +89,14 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
     $scope.anyService.addAlert('success', msg);
   };
 
+  var _warn = function (msg) {
+    $scope.anyService.addAlert('warning', msg);
+  };
+
   var _latLngFromBuilding = function (b) {
     if (b && b.coordinates_lat && b.coordinates_lon) {
-      return [ parseFloat(b.coordinates_lat),
-        parseFloat(b.coordinates_lon) ]
+      return L.latLng(parseFloat(b.coordinates_lat),
+        parseFloat(b.coordinates_lon));
     }
     return undefined;
   };
@@ -167,9 +171,10 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
             + '<span>' + b.description + '</span>'
             + '</div>';
           var tpl = $compile(htmlContent)($scope);        
+          marker.building = b;
           marker.addTo($scope.markerGroup).bindPopup(tpl[0]);
           // marker.infoContent = htmlContent;
-          // marker.building = b;
+          
 
           $scope.myBuildingsHashT[b.buid] = {
             marker: marker,
@@ -184,6 +189,15 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
           //         $scope.anyService.selectedBuilding = self.building;
           //     });
           // });
+
+          marker.on('click', function () {
+              // infowindow.setContent(this.infoContent);
+              // infowindow.open(GMapService.gmap, this);
+              var self = this;
+              $scope.$apply(function () {
+                $scope.anyService.selectedBuilding = self.building;
+              });
+          });
         }
 
         // using the latest building form localStorage
@@ -429,13 +443,6 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
   $(".draggable-building").draggable({
     helper: 'clone',
     stop: function (e) {
-      //setting the icon to initial position
-      // $( '#draggable-building' ).css( 'top', topPos );
-      // $( '#draggable-building' ).css( 'left', leftPos );
-
-      // $(".draggable-building").css({top: 0, left: 0});
-// $(".draggable-building").removeClass('ui-draggable ui-draggable-handle ui-draggable-dragging');            
-// $scope.makeBuildingDraggableAgain();
       var point = L.point(e.pageX, e.pageY);
       var ll = $scope.gmapService.gmap.containerPointToLatLng(point);
       $scope.placeMarker(ll);
@@ -445,13 +452,14 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
 
   $scope.placeMarker = function (location) {
 
-    // var prevMarker = $scope.myMarkers[$scope.myMarkerId - 1];
-
+    var prevMarker = $scope.myMarkers[$scope.myMarkerId - 1];
+    /* Needs testing?*/
     // if (prevMarker && prevMarker.marker && prevMarker.marker.getMap() && prevMarker.marker.getDraggable()) {
-    //     // TODO: alert for already pending building.
-    //     console.log('there is a building pending, please add 1 at a time');
-    //     return;
-    // }
+    if (prevMarker && prevMarker.marker && prevMarker.marker.dragging.enabled()) {
+      $scope.$apply(_warn("There is a building pending, please add 1 at a time."));
+      console.log('there is a building pending, please add 1 at a time');
+      return;
+    }
 
     // var marker = new google.maps.Marker({
     //     position: location,
@@ -516,6 +524,7 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
 
     
     var tpl = $compile(htmlContent)($scope);        
+    marker.tpl2 = $compile(htmlContent2)($scope);
     marker.addTo($scope.markerGroup).bindPopup(tpl[0]).openPopup();
     console.log("for debugging");
     // var infowindow = new google.maps.InfoWindow({
@@ -665,7 +674,7 @@ app.controller('BuildingController', ['$scope', '$compile', 'GMapService', 'Anyp
         }
       },
       function (resp) {
-        // TODO: alert failure
+        _err(resp.data.message);
         console.log(resp.data.message);
       }
     );
