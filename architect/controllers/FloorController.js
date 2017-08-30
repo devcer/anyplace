@@ -61,12 +61,15 @@ app.controller('FloorController', ['$scope', 'AnyplaceService', 'GMapService', '
     $scope.anyService.addAlert('success', msg);
   };
 
+  var _warn = function (msg) {
+    $scope.anyService.addAlert('warning', msg);
+  };
+
   var _latLngFromBuilding = function (b) {
     if (b && b.coordinates_lat && b.coordinates_lon) {
-      return [
+      return L.latLng(
       parseFloat(b.coordinates_lat),
-      parseFloat(b.coordinates_lon)
-      ]
+      parseFloat(b.coordinates_lon))
     }
     return undefined;
   };
@@ -77,9 +80,11 @@ app.controller('FloorController', ['$scope', 'AnyplaceService', 'GMapService', '
       // GMapService.gmap.panTo(_latLngFromBuilding($scope.anyService.selectedBuilding));
       // GMapService.gmap.setZoom(19);
       $scope.gmapService.gmap.setView(_latLngFromBuilding($scope.anyService.selectedBuilding), 19);
-      
-      if (heatmap)
-        heatmap.setMap(null);
+      /* Needs testing */
+      if (heatmap){
+        heatmap.remove();
+        // heatmap.setMap(null);
+      }
 
       if (typeof(Storage) !== "undefined" && localStorage) {
         localStorage.setItem("lastFloor", newVal.floor_number);
@@ -154,7 +159,7 @@ app.controller('FloorController', ['$scope', 'AnyplaceService', 'GMapService', '
   $scope.fetchFloorPlanOverlay = function () {
 
     if (!_isValidFloorNumber(this.anyService.selectedFloor)) {
-      // TODO: alert
+      _warn('something is wrong with the floor');
       console.log('something is wrong with the floor');
       return;
     }
@@ -172,7 +177,9 @@ app.controller('FloorController', ['$scope', 'AnyplaceService', 'GMapService', '
         //   $scope.data.floor_plan_groundOverlay.setMap(null);
         //   $scope.data.floor_plan_groundOverlay = null;
         // }
-        /* Needs testing */
+        if ($scope.data.floor_plan_groundOverlay != null) {
+          $scope.data.floor_plan_groundOverlay.remove();
+        }
         // on success
         var data = "data:image/jpeg;base64,"+resp.data.split('base64')[1];
 
@@ -194,12 +201,13 @@ app.controller('FloorController', ['$scope', 'AnyplaceService', 'GMapService', '
           ]
         }
        ).addTo($scope.gmapService.gmap);
-        // TODO: alert success
+       
+       _suc('Successfully downloaded floor plan');
       },
       function (resp) {
         // on error
         console.log('error downloading floor plan');
-        // TODO: alert failure
+        _err('error downloading floor plan');
       }
     );
   };
@@ -238,8 +246,10 @@ app.controller('FloorController', ['$scope', 'AnyplaceService', 'GMapService', '
         // if ($scope.data.floor_plan_groundOverlay && $scope.data.floor_plan_groundOverlay.getMap()) {
         //   $scope.data.floor_plan_groundOverlay.setMap(null);
         // }
+        if ($scope.data.floor_plan_groundOverlay) {
+          $scope.data.floor_plan_groundOverlay.remove();
+        }
       }
-
     };
     reader.readAsDataURL(e.target.files[0]);
 
@@ -293,8 +303,8 @@ app.controller('FloorController', ['$scope', 'AnyplaceService', 'GMapService', '
     // canvasOverlay.setMap(null); // remove the canvas overlay since the groundoverlay is placed
     $('#input-floor-plan').prop('disabled', false);
     $('#input-floor-plan').prop('value', '');
-    // $scope.isCanvasOverlayActive = false;
-    $scope.$apply($scope.isCanvasOverlayActive = false);
+    $scope.isCanvasOverlayActive = false;
+    // $scope.$apply($scope.isCanvasOverlayActive = false);
 
     if (_floorNoExists($scope.newFloorNumber)) {
       for (var i = 0; i < $scope.xFloors.length; i++) {
@@ -355,6 +365,7 @@ app.controller('FloorController', ['$scope', 'AnyplaceService', 'GMapService', '
         // insert the newly created building inside the loadedBuildings
         $scope.xFloors.push(obj);
 
+        canvasOverlay.editing.disable();
         $scope.anyService.selectedFloor = $scope.xFloors[$scope.xFloors.length - 1];
 
         _suc("Successfully added new floor");
@@ -379,7 +390,7 @@ app.controller('FloorController', ['$scope', 'AnyplaceService', 'GMapService', '
       canvasOverlay.remove();
     }
 
-
+    /* Need to migrate */
     // if ($scope.data.floor_plan_groundOverlay) {
     //   $scope.data.floor_plan_groundOverlay.setMap($scope.gmapService.gmap);
     // }
@@ -389,8 +400,8 @@ app.controller('FloorController', ['$scope', 'AnyplaceService', 'GMapService', '
 
     x.prop('disabled', false);
     x.prop('value','');
-    // $scope.isCanvasOverlayActive = false;
-    $scope.$apply($scope.isCanvasOverlayActive = false);
+    $scope.isCanvasOverlayActive = false;
+    // $scope.$apply($scope.isCanvasOverlayActive = false);
   };
 
   $scope.deleteFloor = function () {
@@ -430,6 +441,10 @@ app.controller('FloorController', ['$scope', 'AnyplaceService', 'GMapService', '
         //   $scope.data.floor_plan_groundOverlay.setMap(null);
         //   $scope.data.floor_plan_groundOverlay = null;
         // }
+
+        if ($scope.data.floor_plan_groundOverlay != null) {
+          $scope.data.floor_plan_groundOverlay.remove();
+        }
 
         if ($scope.xFloors && $scope.xFloors.length > 0) {
           $scope.anyService.selectedFloor = $scope.xFloors[0];
@@ -544,20 +559,24 @@ app.controller('FloorController', ['$scope', 'AnyplaceService', 'GMapService', '
         // on error
         var data = resp.data;
         //TODO: alert error
-        _suc("Successfully uploaded new floor plan.");
+        _err("Error uploading new floor plan.");
+        // _suc("Successfully uploaded new floor plan.");
       });
 
   }
 
   $scope.toggleRadioHeatmap = function () {
+    /* Needs testing */
     if (heatmap && heatmap.getMap()) {
-      heatmap.setMap(null);
+      // heatmap.setMap(null);
+      heatmap.remove();
       return;
     }
 
     $scope.showRadioHeatmap();
   };
 
+  /* need to migrate */
   $scope.getHeatMapButtonText = function () {
     return heatmap && heatmap.getMap() ? "Hide WiFi Map" : "Show WiFi Map";
   };
